@@ -45,28 +45,24 @@
 
     .brand { font-family: 'Orbitron', monospace; font-size: 42px; font-weight: 900; letter-spacing: 8px; color: #00ffb4; text-shadow: 0 0 30px #00ffb4; }
     .tagline { font-size: 18px; color: #aaffdd; letter-spacing: 4px; margin-top: 8px; font-weight: 300; }
-    .pulse-ring {
-      width: 120px; height: 120px;
-      border: 2px solid #00ffb4;
-      border-radius: 50%;
+    .logo-container {
+      width: 120px;
+      height: 120px;
       margin-bottom: 24px;
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .pulse-ring::before, .pulse-ring::after {
-      content: '';
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(0,255,180,0.4);
-      animation: pulseOut 2s ease-out infinite;
+    .logo-container svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 20px #00ffb4);
+      animation: logoGlow 2s ease-in-out infinite;
     }
-    .pulse-ring::before { width: 100%; height: 100%; animation-delay: 0s; }
-    .pulse-ring::after { width: 100%; height: 100%; animation-delay: 1s; }
-    @keyframes pulseOut {
-      0% { width: 100%; height: 100%; opacity: 1; }
-      100% { width: 200%; height: 200%; opacity: 0; }
+    @keyframes logoGlow {
+      0%, 100% { filter: drop-shadow(0 0 20px #00ffb4); }
+      50% { filter: drop-shadow(0 0 30px #00ffb4); }
     }
-    .watch-icon { font-size: 48px; }
 
     /* Scene 2 – scanning pad */
     .scan-demo { position: relative; margin-bottom: 16px; }
@@ -172,18 +168,40 @@
     /* Scene 6 – final CTA */
     .cta-btn {
       margin-top: 20px;
-      padding: 12px 36px;
-      border: 1.5px solid #00ffb4;
-      background: transparent;
+      padding: 14px 40px;
+      border: 2px solid #00ffb4;
+      background: rgba(0,255,180,0.1);
       color: #00ffb4;
       font-family: 'Orbitron', monospace;
       font-size: 13px;
       letter-spacing: 3px;
       cursor: pointer;
       transition: all 0.3s;
-      border-radius: 4px;
+      border-radius: 6px;
+      box-shadow: 0 0 15px rgba(0,255,180,0.3);
+      position: relative;
+      overflow: hidden;
     }
-    .cta-btn:hover { background: #00ffb4; color: #000; }
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,255,180,0.3), transparent);
+      transition: left 0.5s;
+    }
+    .cta-btn:hover {
+      background: #00ffb4;
+      color: #000;
+      box-shadow: 0 0 25px rgba(0,255,180,0.6);
+      transform: scale(1.05);
+    }
+    .cta-btn:hover::before {
+      left: 100%;
+    }
+    .cta-btn:active {
+      transform: scale(0.98);
+    }
     .price-note { font-size: 12px; color: #667; margin-top: 12px; letter-spacing: 2px; }
 
     /* Progress bar */
@@ -202,6 +220,20 @@
     }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,255,180,0.3); cursor: pointer; transition: background 0.3s; }
     .dot.on { background: #00ffb4; }
+
+    /* Scroll hints */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: rgba(0,255,180,0.5);
+      letter-spacing: 2px;
+      animation: fadeInOut 2s ease-in-out infinite;
+      z-index: 98;
+    }
+    @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
     /* Grid bg */
     .grid-bg {
@@ -229,9 +261,20 @@
 
   <!-- Scene 1: Brand Intro -->
   <div class="scene active" id="s1">
-    <div class="pulse-ring"><span class="watch-icon">⌚</span></div>
+    <div class="logo-container">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Dark blue triangle top -->
+        <path d="M 100 30 L 160 110 L 40 110 Z" fill="#001a4d" />
+        <!-- Center vertical line -->
+        <line x1="100" y1="50" x2="100" y2="110" stroke="#001a4d" stroke-width="8" />
+        <!-- Cyan arcs -->
+        <path d="M 60 100 Q 100 130 140 100" stroke="#00d4ff" stroke-width="6" fill="none" stroke-linecap="round" />
+        <path d="M 50 110 Q 100 150 150 110" stroke="#00d4ff" stroke-width="6" fill="none" stroke-linecap="round" />
+        <path d="M 40 120 Q 100 170 160 120" stroke="#00d4ff" stroke-width="6" fill="none" stroke-linecap="round" />
+      </svg>
+    </div>
     <div class="brand">NEXAR</div>
-    <div class="tagline">FIND EVERYTHING. LOSE NOTHING.</div>
+    <div class="tagline">FIND IT. FETCH IT.</div>
     <div style="margin-top:18px; font-size:13px; color:#446655; letter-spacing:3px;">THE WORLD'S FIRST X-RAY RADAR WATCH</div>
   </div>
 
@@ -311,7 +354,7 @@
       Never lose anything again.<br>
       Find what matters. Bring it home.
     </div>
-    <button class="cta-btn">DISCOVER NEXAR ↗</button>
+    <button class="cta-btn" onclick="window.location.href='coming-soon.html'">DISCOVER NEXAR ↗</button>
     <div class="price-note">NEXAR WATCH · NEXARPAD · NEXARPULL</div>
   </div>
 
@@ -324,17 +367,21 @@
     <div class="dot" onclick="goTo(4)"></div>
     <div class="dot" onclick="goTo(5)"></div>
   </div>
+  <div class="scroll-hint" id="scroll-hint">← SCROLL / SWIPE →</div>
 </div>
 
 <script>
   const scenes = document.querySelectorAll('.scene');
   const dots = document.querySelectorAll('.dot');
   const bar = document.getElementById('progress-bar');
+  const scrollHint = document.getElementById('scroll-hint');
   let current = 0;
   let timer;
   let progressTimer;
   let progressVal = 0;
   const DURATION = 10000;
+  let touchStartX = 0;
+  let touchEndX = 0;
 
   function goTo(idx) {
     scenes[current].classList.remove('active');
@@ -359,6 +406,30 @@
       goTo((current + 1) % scenes.length);
     }, DURATION);
   }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goTo((current - 1 + scenes.length) % scenes.length);
+    if (e.key === 'ArrowRight') goTo((current + 1) % scenes.length);
+  });
+
+  // Mouse wheel navigation
+  document.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    if (e.deltaY > 0) goTo((current + 1) % scenes.length);
+    else goTo((current - 1 + scenes.length) % scenes.length);
+  }, { passive: false });
+
+  // Touch swipe navigation
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    if (touchStartX - touchEndX > 50) goTo((current + 1) % scenes.length);
+    if (touchEndX - touchStartX > 50) goTo((current - 1 + scenes.length) % scenes.length);
+  }, false);
 
   resetProgress();
 </script>
