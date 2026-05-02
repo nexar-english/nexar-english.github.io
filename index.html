@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXAR - The World's First X-Ray Radar Watch</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    #nexar-ad {
+      font-family: 'Rajdhani', sans-serif;
+      background: #000;
+      color: #fff;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+      padding: 20px;
+      text-align: center;
+    }
+    .scene.active { opacity: 1; }
+
+    /* Scanlines overlay */
+    #nexar-ad::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,180,0.02) 3px, rgba(0,255,180,0.02) 4px);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .brand { font-family: 'Orbitron', monospace; font-size: 42px; font-weight: 900; letter-spacing: 8px; color: #00ffb4; text-shadow: 0 0 30px #00ffb4; }
+    .tagline { font-size: 18px; color: #aaffdd; letter-spacing: 4px; margin-top: 8px; font-weight: 300; }
+    .pulse-ring {
+      width: 120px; height: 120px;
+      border: 2px solid #00ffb4;
+      border-radius: 50%;
+      margin-bottom: 24px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pulse-ring::before, .pulse-ring::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(0,255,180,0.4);
+      animation: pulseOut 2s ease-out infinite;
+    }
+    .pulse-ring::before { width: 100%; height: 100%; animation-delay: 0s; }
+    .pulse-ring::after { width: 100%; height: 100%; animation-delay: 1s; }
+    @keyframes pulseOut {
+      0% { width: 100%; height: 100%; opacity: 1; }
+      100% { width: 200%; height: 200%; opacity: 0; }
+    }
+    .watch-icon { font-size: 48px; }
+
+    /* Scene 2 – scanning pad */
+    .scan-demo { position: relative; margin-bottom: 16px; }
+    .pad {
+      width: 200px; height: 120px;
+      border: 1.5px solid #00ffb4;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,255,180,0.04);
+    }
+    .pad-label { position: absolute; top: 6px; left: 10px; font-size: 11px; color: #00ffb4; letter-spacing: 2px; }
+    .scan-beam {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00ffb4, transparent);
+      animation: scanBeam 1.6s linear infinite;
+      box-shadow: 0 0 12px #00ffb4;
+    }
+    @keyframes scanBeam { 0% { top: 0; } 100% { top: 100%; } }
+    .object-icon { font-size: 32px; z-index: 2; }
+    .scene-title { font-family: 'Orbitron', monospace; font-size: 16px; color: #00ffb4; letter-spacing: 3px; margin-bottom: 8px; }
+    .scene-desc { font-size: 15px; color: #cceedd; line-height: 1.6; max-width: 360px; font-weight: 300; letter-spacing: 1px; }
+
+    /* Scene 3 – radar map */
+    .radar-wrap { position: relative; width: 200px; height: 200px; margin-bottom: 16px; }
+    .radar-circle {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(0,255,180,0.3);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+    }
+    .radar-sweep {
+      position: absolute; top: 50%; left: 50%;
+      width: 96px; height: 2px;
+      transform-origin: left center;
+      background: linear-gradient(90deg, rgba(0,255,180,0.8), transparent);
+      animation: sweep 2s linear infinite;
+      box-shadow: 0 0 8px #00ffb4;
+    }
+    @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .radar-dot {
+      position: absolute; width: 10px; height: 10px;
+      border-radius: 50%; background: #ff4466;
+      box-shadow: 0 0 12px #ff4466;
+      top: 35%; left: 62%;
+      animation: blink 1s ease infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+    .radar-crosshair {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 12px; height: 12px;
+      border: 1.5px solid #00ffb4;
+      border-radius: 50%;
+    }
+    .found-label {
+      position: absolute; top: 32%; left: 66%;
+      font-size: 10px; color: #ff4466; letter-spacing: 1px;
+      animation: blink 1s ease infinite;
+      white-space: nowrap;
+    }
+
+    /* Scene 4 – levitate */
+    .levitate-scene { position: relative; height: 180px; width: 200px; margin-bottom: 16px; }
+    .item-levitating {
+      position: absolute; font-size: 36px;
+      left: 50%; transform: translateX(-50%);
+      animation: levitate 2.2s ease-in-out infinite;
+    }
+    @keyframes levitate { 0%,100% { bottom: 30px; } 50% { bottom: 90px; } }
+    .glow-ring-lev {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 14px;
+      border-radius: 50%;
+      background: rgba(0,255,180,0.15);
+      box-shadow: 0 0 20px #00ffb4;
+      animation: glowPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes glowPulse { 0%,100% { transform: translateX(-50%) scaleX(1); opacity: 0.6; } 50% { transform: translateX(-50%) scaleX(0.6); opacity: 0.2; } }
+    .beam-up {
+      position: absolute; bottom: 24px; left: 50%;
+      width: 2px; background: linear-gradient(to top, rgba(0,255,180,0.6), transparent);
+      transform: translateX(-50%);
+      animation: beamHeight 2.2s ease-in-out infinite;
+    }
+    @keyframes beamHeight { 0%,100%{ height: 40px; } 50%{ height: 80px; } }
+    .coming-to-you { font-size: 11px; color: #00ffb4; letter-spacing: 2px; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+    /* Scene 5 – person tracking */
+    .consent-box {
+      border: 1px solid rgba(0,255,180,0.4);
+      border-radius: 10px;
+      padding: 16px 24px;
+      margin-bottom: 16px;
+      background: rgba(0,255,180,0.03);
+      max-width: 340px;
+    }
+    .consent-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 14px; color: #aaffdd; letter-spacing: 1px; }
+    .check { color: #00ffb4; font-size: 16px; }
+    .fingerprint { font-size: 32px; margin-bottom: 8px; }
+
+    /* Scene 6 – final CTA */
+    .cta-btn {
+      margin-top: 20px;
+      padding: 12px 36px;
+      border: 1.5px solid #00ffb4;
+      background: transparent;
+      color: #00ffb4;
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 4px;
+    }
+    .cta-btn:hover { background: #00ffb4; color: #000; }
+    .price-note { font-size: 12px; color: #667; margin-top: 12px; letter-spacing: 2px; }
+
+    /* Progress bar */
+    #progress-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 2px; background: #00ffb4;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 8px #00ffb4;
+      z-index: 99;
+    }
+
+    /* Nav dots */
+    #nav-dots {
+      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 99;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,255,180,0.3); cursor: pointer; transition: background 0.3s; }
+    .dot.on { background: #00ffb4; }
+
+    /* Grid bg */
+    .grid-bg {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0,255,180,0.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,255,180,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .highlight { color: #00ffb4; font-weight: 600; }
+
+    .corner { position: absolute; width: 16px; height: 16px; border-color: rgba(0,255,180,0.5); border-style: solid; }
+    .corner.tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+    .corner.tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
+    .corner.bl { bottom: 20px; left: 12px; border-width: 0 0 1px 1px; }
+    .corner.br { bottom: 20px; right: 12px; border-width: 0 1px 1px 0; }
+  </style>
+</head>
+<body>
+
+<div id="nexar-ad">
+  <div class="grid-bg"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+
+  <!-- Scene 1: Brand Intro -->
+  <div class="scene active" id="s1">
+    <div class="pulse-ring"><span class="watch-icon">⌚</span></div>
+    <div class="brand">NEXAR</div>
+    <div class="tagline">FIND EVERYTHING. LOSE NOTHING.</div>
+    <div style="margin-top:18px; font-size:13px; color:#446655; letter-spacing:3px;">THE WORLD'S FIRST X-RAY RADAR WATCH</div>
+  </div>
+
+  <!-- Scene 2: Scan Pad -->
+  <div class="scene" id="s2">
+    <div class="scene-title">01 — SCAN & STORE</div>
+    <div class="scan-demo">
+      <div class="pad">
+        <div class="pad-label">NEXAR PAD</div>
+        <div class="scan-beam"></div>
+        <span class="object-icon">🔑</span>
+      </div>
+    </div>
+    <div class="scene-desc">
+      Place any object on the <span class="highlight">NexarPad</span>.<br>
+      It scans, maps, and stores every detail in your personal secure database — in seconds.
+    </div>
+  </div>
+
+  <!-- Scene 3: Radar Find -->
+  <div class="scene" id="s3">
+    <div class="scene-title">02 — LOCATE INSTANTLY</div>
+    <div class="radar-wrap">
+      <div class="radar-circle" style="width:60px;height:60px;"></div>
+      <div class="radar-circle" style="width:120px;height:120px;"></div>
+      <div class="radar-circle" style="width:190px;height:190px;"></div>
+      <div class="radar-crosshair"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-dot"></div>
+      <div class="found-label">FOUND</div>
+    </div>
+    <div class="scene-desc">
+      Lost something? Select your <span class="highlight">scan area</span> on your watch.<br>
+      Larger area = wider sweep. NEXAR pings the object and pins it on your map.
+    </div>
+  </div>
+
+  <!-- Scene 4: Levitate -->
+  <div class="scene" id="s4">
+    <div class="scene-title">03 — RETRIEVE IT</div>
+    <div class="levitate-scene">
+      <div class="beam-up"></div>
+      <div class="glow-ring-lev"></div>
+      <div class="item-levitating">🔑</div>
+      <div class="coming-to-you">COMING TO YOU</div>
+    </div>
+    <div class="scene-desc">
+      With the optional <span class="highlight">NexarPull device</span>, your item levitates and flies back to your hand — like calling your own hammer.
+    </div>
+    <div style="margin-top:10px; font-size:11px; color:#556655; letter-spacing:2px;">* NEXARPULL SOLD SEPARATELY</div>
+  </div>
+
+  <!-- Scene 5: Person Tracking -->
+  <div class="scene" id="s5">
+    <div class="scene-title">04 — FIND PEOPLE TOO</div>
+    <div class="fingerprint">🫆</div>
+    <div class="consent-box">
+      <div class="consent-row"><span class="check">✓</span> Mutual consent from both parties</div>
+      <div class="consent-row"><span class="check">✓</span> Fingerprint of Person A verified</div>
+      <div class="consent-row"><span class="check">✓</span> Fingerprint of Person B verified</div>
+    </div>
+    <div class="scene-desc">
+      NEXAR lets you find family and friends — only with <span class="highlight">full mutual consent</span> and dual fingerprint authentication. Privacy is not optional.
+    </div>
+  </div>
+
+  <!-- Scene 6: CTA -->
+  <div class="scene" id="s6">
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px;color:#00ffb4;letter-spacing:4px;margin-bottom:4px;">INTRODUCING</div>
+      <div class="brand" style="font-size:36px;">NEXAR</div>
+    </div>
+    <div style="font-size:14px;color:#aaffdd;letter-spacing:2px;line-height:2;">
+      Scan Pad &nbsp;·&nbsp; Radar Watch &nbsp;·&nbsp; NexarPull Device
+    </div>
+    <div style="margin-top:16px;font-size:13px;color:#cceedd;max-width:320px;line-height:1.8;">
+      Never lose anything again.<br>
+      Find what matters. Bring it home.
+    </div>
+    <button class="cta-btn">DISCOVER NEXAR ↗</button>
+    <div class="price-note">NEXAR WATCH · NEXARPAD · NEXARPULL</div>
+  </div>
+
+  <div id="progress-bar" style="width:0%"></div>
+  <div id="nav-dots">
+    <div class="dot on" onclick="goTo(0)"></div>
+    <div class="dot" onclick="goTo(1)"></div>
+    <div class="dot" onclick="goTo(2)"></div>
+    <div class="dot" onclick="goTo(3)"></div>
+    <div class="dot" onclick="goTo(4)"></div>
+    <div class="dot" onclick="goTo(5)"></div>
+  </div>
+</div>
+
+<script>
+  const scenes = document.querySelectorAll('.scene');
+  const dots = document.querySelectorAll('.dot');
+  const bar = document.getElementById('progress-bar');
+  let current = 0;
+  let timer;
+  let progressTimer;
+  let progressVal = 0;
+  const DURATION = 4000;
+
+  function goTo(idx) {
+    scenes[current].classList.remove('active');
+    dots[current].classList.remove('on');
+    current = idx;
+    scenes[current].classList.add('active');
+    dots[current].classList.add('on');
+    resetProgress();
+  }
+
+  function resetProgress() {
+    clearTimeout(timer);
+    clearInterval(progressTimer);
+    progressVal = 0;
+    bar.style.width = '0%';
+    progressTimer = setInterval(() => {
+      progressVal += 100 / (DURATION / 100);
+      if (progressVal > 100) progressVal = 100;
+      bar.style.width = progressVal + '%';
+    }, 100);
+    timer = setTimeout(() => {
+      goTo((current + 1) % scenes.length);
+    }, DURATION);
+  }
+
+  resetProgress();
+</script>
+
+</body>
+</html>
